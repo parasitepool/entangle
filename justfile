@@ -42,7 +42,7 @@ publish-release revision='master':
   #!/usr/bin/env bash
   set -euxo pipefail
   rm -rf tmp/release
-  git clone git@github.com:parasitepool/para.git tmp/release
+  git clone git@github.com:parasitepool/entangle.git tmp/release
   cd tmp/release
   git checkout {{ revision }}
   cargo publish
