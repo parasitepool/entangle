@@ -1,4 +1,4 @@
-<h1 style="text-align: center;"><code>entangle</code></h1>
+<h1 align=center><code>entangle</code></h1>
 
 <!-- <div align=center>
   <a href=https://crates.io/crates/entangle>
