@@ -1,7 +1,9 @@
 use clap::Parser;
 
 #[derive(Parser)]
-#[command(name = "entangle", about = "Description here")]
+#[command(version, author)]
 struct Args {}
 
-pub fn main() {}
+pub fn main() {
+    Args::parse();
+}
