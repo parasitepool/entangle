@@ -1,0 +1,39 @@
+[package]
+name = "entangle"
+description = "Swaps made easy"
+version = "0.1.0"
+homepage = "https://github.com/parasitepool/entangle"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[workspace]
+members = ["."]
+
+[workspace.package]
+authors = ["The Parasite Devs"]
+edition = "2024"
+license = "CC0-1.0"
+repository = "https://github.com/parasitepool/entangle"
+rust-version = "1.91.0"
+
+[workspace.dependencies]
+clap = { version = "4.5.36", features = ["derive", "env"] }
+
+[dependencies]
+clap.workspace = true
+
+[[bin]]
+name = "entangle"
+path = "src/bin/main.rs"
+
+[lib]
+name = "entangle"
+path = "src/lib.rs"
+
+[[test]]
+name = "integration"
+path = "tests/lib.rs"
