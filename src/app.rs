@@ -3,6 +3,7 @@ use leptos_meta::{Link, MetaTags, Title};
 use leptos_router::{
     StaticSegment,
     components::{Route, Router, Routes},
+    hooks::use_location,
 };
 
 /// HTML shell wrapping the App. Used server-side to render the full document.
@@ -18,7 +19,8 @@ pub fn shell(options: leptos::config::LeptosOptions) -> impl IntoView {
                 <HydrationScripts options/>
                 <MetaTags/>
             </head>
-            <body style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
+            <body style="margin: 0; font-family: system-ui, -apple-system, sans-serif; \
+                         background: #0f0f23; color: #e0e0e0;">
                 <App/>
             </body>
         </html>
@@ -37,6 +39,7 @@ pub fn App() -> impl IntoView {
             <Layout>
                 <Routes fallback=|| view! { <p>"Page not found"</p> }>
                     <Route path=StaticSegment("") view=HomePage/>
+                    <Route path=StaticSegment("listings") view=ListingsPage/>
                 </Routes>
             </Layout>
         </Router>
@@ -61,6 +64,8 @@ fn Layout(children: Children) -> impl IntoView {
 #[component]
 fn NavBar(sidebar_open: RwSignal<bool>) -> impl IntoView {
     let toggle = move |_| sidebar_open.update(|open| *open = !*open);
+    let location = use_location();
+    let show_toggle = move || location.pathname.get() != "/" || sidebar_open.get();
 
     view! {
         <nav style="position: fixed; top: 0; left: 0; right: 0; height: 48px; \
@@ -69,20 +74,40 @@ fn NavBar(sidebar_open: RwSignal<bool>) -> impl IntoView {
                      box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
             <button
                 on:click=toggle
-                style="background: none; border: none; color: #fff; \
-                       font-size: 20px; cursor: pointer; margin-right: 16px; \
-                       padding: 4px 8px;"
+                style=move || format!(
+                    "background: none; border: none; color: #fff; \
+                     font-size: 20px; cursor: pointer; margin-right: 16px; \
+                     padding: 4px 8px; visibility: {};",
+                    if show_toggle() { "visible" } else { "hidden" }
+                )
             >
                 {move || if sidebar_open.get() { "\u{2715}" } else { "\u{2630}" }}
             </button>
             <span style="font-weight: 700; font-size: 18px; margin-right: 32px;">
                 "entangle"
             </span>
-            <a href="/" style="color: #ccc; text-decoration: none; padding: 4px 12px; \
-                               font-size: 14px;">
-                "Home"
-            </a>
+            <NavLink href="/" label="Home"/>
+            <NavLink href="/listings" label="Listings"/>
         </nav>
+    }
+}
+
+/// A navigation link that highlights when active.
+#[component]
+fn NavLink(href: &'static str, label: &'static str) -> impl IntoView {
+    let location = use_location();
+    let is_active = move || location.pathname.get() == href;
+
+    view! {
+        <a
+            href=href
+            style=move || format!(
+                "text-decoration: none; padding: 4px 12px; font-size: 14px; color: {};",
+                if is_active() { "#6c63ff" } else { "#ccc" }
+            )
+        >
+            {label}
+        </a>
     }
 }
 
@@ -114,7 +139,17 @@ fn Sidebar(sidebar_open: RwSignal<bool>) -> impl IntoView {
 #[component]
 fn HomePage() -> impl IntoView {
     view! {
-        <h1>"entangle"</h1>
-        <p>"Swaps made easy"</p>
+        <div style="text-align: center; padding-top: 80px;">
+            <h1 style="font-size: 48px; margin: 0; color: #6c63ff;">"entangle"</h1>
+            <p style="font-size: 20px; color: #f72585; margin-top: 8px;">"Swaps made easy"</p>
+        </div>
+    }
+}
+
+#[component]
+fn ListingsPage() -> impl IntoView {
+    view! {
+        <h1 style="color: #6c63ff;">"Listings"</h1>
+        <p>"No listings yet."</p>
     }
 }
