@@ -4,7 +4,7 @@ set dotenv-filename := ".env.local"
 import? 'justfile.local'
 
 dev:
-    cargo run
+    cargo run -- server
 
 init:
     hermit init --quiet

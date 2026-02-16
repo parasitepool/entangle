@@ -1,27 +1,15 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
-use http_body_util::BodyExt;
+use leptos::config::get_configuration;
 use tower::ServiceExt;
 
 use crate::*;
 
 #[tokio::test]
-async fn get_index_returns_placeholder() {
-    let app = entangle::server::router();
-    let response = app
-        .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
-        .await
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::OK);
-
-    let body = response.into_body().collect().await.unwrap().to_bytes();
-    assert_eq!(&body[..], b"entangle frontend - coming soon");
-}
-
-#[tokio::test]
 async fn with_api_nesting() {
-    let app = entangle::server::router().nest("/api", entangle::api::router());
+    let conf = get_configuration(None).unwrap();
+    let leptos_options = conf.leptos_options;
+    let app = entangle::server::router(leptos_options, true);
     let response = app
         .oneshot(
             Request::builder()

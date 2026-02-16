@@ -1,9 +1,16 @@
+pub mod app;
+
+#[cfg(feature = "ssr")]
 pub mod api;
+#[cfg(feature = "ssr")]
 pub mod server;
+#[cfg(feature = "ssr")]
 pub mod swap;
 
+#[cfg(feature = "ssr")]
 use clap::{Parser, Subcommand};
 
+#[cfg(feature = "ssr")]
 #[derive(Parser)]
 #[command(version, author, about = "Swaps made easy")]
 pub struct Args {
@@ -11,6 +18,7 @@ pub struct Args {
     pub command: Command,
 }
 
+#[cfg(feature = "ssr")]
 #[derive(Subcommand)]
 pub enum Command {
     /// Start the REST API server.
@@ -30,6 +38,7 @@ pub enum Command {
     },
 }
 
+#[cfg(feature = "ssr")]
 pub async fn main() {
     let args = Args::parse();
 
@@ -41,4 +50,11 @@ pub async fn main() {
             server::serve(&bind, with_api).await;
         }
     }
+}
+
+#[cfg(feature = "hydrate")]
+#[wasm_bindgen::prelude::wasm_bindgen]
+pub fn hydrate() {
+    console_error_panic_hook::set_once();
+    leptos::mount::hydrate_body(app::App);
 }

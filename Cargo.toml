@@ -12,7 +12,6 @@ repository.workspace = true
 rust-version.workspace = true
 
 [workspace]
-members = ["."]
 
 [workspace.package]
 authors = ["The Parasite Devs"]
@@ -25,19 +24,56 @@ rust-version = "1.91.0"
 axum = "0.8"
 bitcoin = { version = "0.32", features = ["base64", "serde", "std"] }
 clap = { version = "4.5.36", features = ["derive", "env"] }
+console_error_panic_hook = "0.1"
 http-body-util = "0.1"
+leptos = "0.8"
+leptos_axum = "0.8"
+leptos_meta = "0.8"
+leptos_router = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tower = { version = "0.5", features = ["util"] }
+wasm-bindgen = "0.2"
+
+[features]
+default = ["ssr"]
+ssr = [
+    "dep:axum",
+    "dep:bitcoin",
+    "dep:clap",
+    "dep:leptos_axum",
+    "dep:serde",
+    "dep:serde_json",
+    "dep:tokio",
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+]
+hydrate = [
+    "dep:console_error_panic_hook",
+    "dep:wasm-bindgen",
+    "leptos/hydrate",
+]
 
 [dependencies]
-axum.workspace = true
-bitcoin.workspace = true
-clap.workspace = true
-serde.workspace = true
-serde_json.workspace = true
-tokio.workspace = true
+# Shared (compiled for both SSR and hydrate)
+leptos = { workspace = true }
+leptos_meta = { workspace = true }
+leptos_router = { workspace = true }
+
+# SSR-only
+axum = { workspace = true, optional = true }
+bitcoin = { workspace = true, optional = true }
+clap = { workspace = true, optional = true }
+leptos_axum = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+
+# Hydrate-only
+console_error_panic_hook = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true, optional = true }
 
 [dev-dependencies]
 http-body-util.workspace = true
@@ -46,11 +82,32 @@ tower.workspace = true
 [[bin]]
 name = "entangle"
 path = "src/bin/main.rs"
+required-features = ["ssr"]
 
 [lib]
 name = "entangle"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [[test]]
 name = "integration"
 path = "tests/lib.rs"
+required-features = ["ssr"]
+
+[package.metadata.leptos]
+output-name = "entangle"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+site-addr = "127.0.0.1:8080"
+reload-port = 3001
+bin-features = ["ssr"]
+bin-default-features = false
+lib-features = ["hydrate"]
+lib-default-features = false
+lib-profile-release = "wasm-release"
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = true
+codegen-units = 1
