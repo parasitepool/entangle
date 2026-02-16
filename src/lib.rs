@@ -1,16 +1,16 @@
-pub mod app;
-
-#[cfg(feature = "ssr")]
+#[cfg(feature = "api")]
 pub mod api;
-#[cfg(feature = "ssr")]
+#[cfg(any(feature = "server", feature = "hydrate"))]
+pub mod app;
+#[cfg(feature = "server")]
 pub mod server;
-#[cfg(feature = "ssr")]
+#[cfg(feature = "api")]
 pub mod swap;
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "api")]
 use clap::{Parser, Subcommand};
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "api")]
 #[derive(Parser)]
 #[command(version, author, about = "Swaps made easy")]
 pub struct Args {
@@ -18,7 +18,7 @@ pub struct Args {
     pub command: Command,
 }
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "api")]
 #[derive(Subcommand)]
 pub enum Command {
     /// Start the REST API server.
@@ -28,6 +28,7 @@ pub enum Command {
         bind: String,
     },
     /// Start the frontend web server.
+    #[cfg(feature = "server")]
     Server {
         /// Address to bind the frontend server to.
         #[arg(long, default_value = "0.0.0.0:8080", env = "ENTANGLE_SERVER_BIND")]
@@ -38,7 +39,7 @@ pub enum Command {
     },
 }
 
-#[cfg(feature = "ssr")]
+#[cfg(feature = "api")]
 pub async fn main() {
     let args = Args::parse();
 
@@ -46,6 +47,7 @@ pub async fn main() {
         Command::Api { bind } => {
             api::serve(&bind).await;
         }
+        #[cfg(feature = "server")]
         Command::Server { bind, with_api } => {
             server::serve(&bind, with_api).await;
         }

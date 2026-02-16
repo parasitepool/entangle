@@ -4,13 +4,18 @@ set dotenv-filename := ".env.local"
 import? 'justfile.local'
 
 dev:
-    cargo run -- server
+    cargo leptos watch server
+
+serve:
+    cargo leptos serve server
 
 init:
     hermit init --quiet
     hermit install just
     hermit install rustup
     rustup default stable
+    rustup target add wasm32-unknown-unknown
+    cargo install cargo-leptos
     cargo clean
     cargo build
 

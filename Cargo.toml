@@ -37,39 +37,50 @@ tower = { version = "0.5", features = ["util"] }
 wasm-bindgen = "0.2"
 
 [features]
-default = ["ssr"]
-ssr = [
+default = ["server"]
+api = [
     "dep:axum",
     "dep:bitcoin",
     "dep:clap",
-    "dep:leptos_axum",
     "dep:serde",
     "dep:serde_json",
     "dep:tokio",
+]
+hydrate = [
+    "dep:console_error_panic_hook",
+    "dep:leptos",
+    "dep:leptos_meta",
+    "dep:leptos_router",
+    "dep:wasm-bindgen",
+    "leptos/hydrate",
+]
+server = [
+    "api",
+    "dep:leptos",
+    "dep:leptos_axum",
+    "dep:leptos_meta",
+    "dep:leptos_router",
     "leptos/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
 ]
-hydrate = [
-    "dep:console_error_panic_hook",
-    "dep:wasm-bindgen",
-    "leptos/hydrate",
-]
 
 [dependencies]
-# Shared (compiled for both SSR and hydrate)
-leptos = { workspace = true }
-leptos_meta = { workspace = true }
-leptos_router = { workspace = true }
-
-# SSR-only
+# API + swap core (enabled by api feature)
 axum = { workspace = true, optional = true }
 bitcoin = { workspace = true, optional = true }
 clap = { workspace = true, optional = true }
-leptos_axum = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
+
+# Leptos (enabled by server or hydrate features)
+leptos = { workspace = true, optional = true }
+leptos_meta = { workspace = true, optional = true }
+leptos_router = { workspace = true, optional = true }
+
+# Server-only
+leptos_axum = { workspace = true, optional = true }
 
 # Hydrate-only
 console_error_panic_hook = { workspace = true, optional = true }
@@ -82,7 +93,7 @@ tower.workspace = true
 [[bin]]
 name = "entangle"
 path = "src/bin/main.rs"
-required-features = ["ssr"]
+required-features = ["api"]
 
 [lib]
 name = "entangle"
@@ -92,7 +103,7 @@ crate-type = ["cdylib", "rlib"]
 [[test]]
 name = "integration"
 path = "tests/lib.rs"
-required-features = ["ssr"]
+required-features = ["server"]
 
 [package.metadata.leptos]
 output-name = "entangle"
@@ -100,10 +111,11 @@ site-root = "target/site"
 site-pkg-dir = "pkg"
 site-addr = "127.0.0.1:8080"
 reload-port = 3001
-bin-features = ["ssr"]
+bin-features = ["server"]
 bin-default-features = false
 lib-features = ["hydrate"]
 lib-default-features = false
+assets-dir = "public"
 lib-profile-release = "wasm-release"
 
 [profile.wasm-release]
