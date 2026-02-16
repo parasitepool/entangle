@@ -1,6 +1,8 @@
 set dotenv-load
 set dotenv-filename := ".env.local"
 
+import? 'justfile.local'
+
 dev:
     cargo run
 

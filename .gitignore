@@ -2,3 +2,5 @@
 
 /.hermit
 /.idea
+
+justfile.local
