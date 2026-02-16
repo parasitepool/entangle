@@ -54,7 +54,11 @@ fn Layout(children: Children) -> impl IntoView {
     view! {
         <NavBar sidebar_open/>
         <Sidebar sidebar_open/>
-        <main style="margin-top: 48px; padding: 24px;">
+        <main style=move || format!(
+            "margin-top: 48px; padding: 24px; \
+             margin-left: {}px; transition: margin-left 0.2s ease;",
+            if sidebar_open.get() { 240 } else { 0 }
+        )>
             {children()}
         </main>
     }
