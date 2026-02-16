@@ -2,6 +2,8 @@
 pub mod api;
 #[cfg(any(feature = "server", feature = "hydrate"))]
 pub mod app;
+#[cfg(any(feature = "server", feature = "hydrate"))]
+pub mod listing;
 #[cfg(feature = "server")]
 pub mod server;
 #[cfg(feature = "api")]
